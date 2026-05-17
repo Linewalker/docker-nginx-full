@@ -9,12 +9,22 @@ RESET='\E[0m'
 echo -e "${BLUE}❯ ${CYAN}Building OpenResty ${YELLOW}${OPENRESTY_VERSION} with nginx_http_geoip2 module...${RESET}"
 
 cd /tmp
-wget "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz"
-tar -xzf openresty-${OPENRESTY_VERSION}.tar.gz
-mv /tmp/openresty-${OPENRESTY_VERSION} /tmp/openresty
-git clone https://github.com/leev/ngx_http_geoip2_module.git
+
+# The official releases:
+# wget "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz" -O "openresty-${OPENRESTY_VERSION}.tar.gz"
+
+# The github tagged releases:
+wget "https://github.com/openresty/openresty/archive/refs/tags/v${OPENRESTY_VERSION}.tar.gz" -O "openresty-${OPENRESTY_VERSION}.tar.gz"
+
+tar -xzf "openresty-${OPENRESTY_VERSION}.tar.gz"
+mv "/tmp/openresty-${OPENRESTY_VERSION}" /tmp/openresty
+git clone 'https://github.com/leev/ngx_http_geoip2_module.git'
 mv /tmp/ngx_http_geoip2_module /tmp/openresty/ngx_http_geoip2_module
 cd /tmp/openresty
+
+make
+
+cd "/tmp/openresty/openresty-${OPENRESTY_VERSION}"
 
 ./configure \
 	--prefix=/etc/nginx \

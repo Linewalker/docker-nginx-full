@@ -2,7 +2,7 @@
 # Nginx Builder
 #############
 
-FROM debian:bookworm-slim AS nginxbuilder
+FROM debian:trixie-slim AS nginxbuilder
 
 ARG OPENRESTY_VERSION
 ARG LUA_VERSION
@@ -13,34 +13,35 @@ RUN apt-get update \
 	build-essential \
 	ca-certificates \
 	libncurses-dev \
-	libpcre3-dev \
+	libpcre2-dev \
 	libreadline-dev \
 	libssl-dev \
 	openssl unzip \
 	wget \
 	zlib1g-dev \
 	git \
-	libmaxminddb-dev
+	libmaxminddb-dev \
+	dos2unix
 
 # Lua build
-COPY ./scripts/build-lua /tmp/build-lua
-RUN /tmp/build-lua
+COPY ./scripts/build-lua.sh /tmp/build-lua.sh
+RUN /tmp/build-lua.sh
 
 # Nginx build
-COPY ./scripts/build-openresty /tmp/build-openresty
-RUN /tmp/build-openresty
+COPY ./scripts/build-openresty.sh /tmp/build-openresty.sh
+RUN /tmp/build-openresty.sh
 
 #############
 # Final Image
 #############
 
-FROM debian:bookworm-slim AS final
+FROM debian:trixie-slim AS final
 LABEL maintainer="Jamie Curnow <jc@jc21.com>"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG TARGETPLATFORM
-RUN echo "Base: debian:bookworm-slim, ${TARGETPLATFORM:-linux/amd64}" > /built-for-arch
+RUN echo "Base: debian:trixie-slim, ${TARGETPLATFORM:-linux/amd64}" > /built-for-arch
 
 # OpenResty uses LuaJIT which has a dependency on GCC
 RUN apt-get update \
@@ -51,7 +52,7 @@ RUN apt-get update \
 	figlet \
 	jq \
 	libncurses6 \
-	libpcre3 \
+	libpcre2-8-0 \
 	libreadline8 \
 	openssl \
 	perl \
@@ -72,26 +73,21 @@ COPY ./files/.bashrc /root/.bashrc
 # Copy lua and luarocks builds from first image
 COPY --from=nginxbuilder /tmp/lua /tmp/lua
 COPY --from=nginxbuilder /tmp/luarocks /tmp/luarocks
-COPY ./scripts/install-lua /tmp/install-lua
+COPY ./scripts/install-lua.sh /tmp/install-lua.sh
 
 # Copy openresty build from first image
 COPY --from=nginxbuilder /tmp/openresty /tmp/openresty
-COPY ./scripts/install-openresty /tmp/install-openresty
-
-# Copy crowdsec openresty bouncer install script
-COPY ./scripts/install-crowdsec_openresty_bouncer /tmp/install-crowdsec_openresty_bouncer
+COPY ./scripts/install-openresty.sh /tmp/install-openresty.sh
 
 ARG OPENRESTY_VERSION
-ARG CROWDSEC_OPENRESTY_BOUNCER_VERSION
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
-	OPENRESTY_VERSION=${OPENRESTY_VERSION} \
-	CROWDSEC_OPENRESTY_BOUNCER_VERSION=${CROWDSEC_OPENRESTY_BOUNCER_VERSION}
+	OPENRESTY_VERSION=${OPENRESTY_VERSION}
 
 # Install openresty, lua, then clean up file system
 RUN apt-get update \
 	&& apt-get install -y gcc make socat git \
-	&& /tmp/install-lua \
-	&& /tmp/install-openresty \
+	&& /tmp/install-lua.sh \
+	&& /tmp/install-openresty.sh \
 	&& apt-get remove -y make gcc git wget gettext \
 	&& apt-get autoremove -y \
 	&& apt-get clean \

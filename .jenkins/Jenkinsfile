@@ -15,11 +15,9 @@ pipeline {
 		IMAGE               = 'nginx-full'
 		BUILDX_NAME         = "${IMAGE}_${GIT_BRANCH}"
 		BRANCH_LOWER        = "${BRANCH_NAME.toLowerCase().replaceAll('/', '-')}"
-		// Software versions; OpenResty does not support Lua >= 5.2
-		OPENRESTY_VERSION                  = '1.27.1.2'
-		CROWDSEC_OPENRESTY_BOUNCER_VERSION = '0.1.7'
-		LUA_VERSION                        = '5.1.5'
-		LUAROCKS_VERSION                   = '3.3.1'
+		OPENRESTY_VERSION   = '1.29.2.4'
+		LUA_VERSION         = '5.5.0'
+		LUAROCKS_VERSION    = '3.13.0'
 	}
 	stages {
 		stage('Environment') {
@@ -68,7 +66,7 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx --push -f docker/Dockerfile ${BUILDX_PUSH_TAGS}"
+					sh "./scripts/buildx.sh --push -f docker/Dockerfile ${BUILDX_PUSH_TAGS}"
 				}
 			}
 		}
@@ -79,8 +77,8 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx --push -f docker/Dockerfile.acmesh ${BUILDX_PUSH_TAGS_ACMESH}"
-					sh "./scripts/buildx --push -f docker/Dockerfile.certbot ${BUILDX_PUSH_TAGS_CERTBOT}"
+					sh "./scripts/buildx.sh --push -f docker/Dockerfile.acmesh ${BUILDX_PUSH_TAGS_ACMESH}"
+					sh "./scripts/buildx.sh --push -f docker/Dockerfile.certbot ${BUILDX_PUSH_TAGS_CERTBOT}"
 				}
 			}
 		}
@@ -91,8 +89,8 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx --push -f docker/Dockerfile.acmesh-golang ${BUILDX_PUSH_TAGS_ACMESH_GOLANG}"
-					sh "./scripts/buildx --push -f docker/Dockerfile.certbot-node ${BUILDX_PUSH_TAGS_CERTBOT_NODE}"
+					sh "./scripts/buildx.sh --push -f docker/Dockerfile.acmesh-golang ${BUILDX_PUSH_TAGS_ACMESH_GOLANG}"
+					sh "./scripts/buildx.sh --push -f docker/Dockerfile.certbot-node ${BUILDX_PUSH_TAGS_CERTBOT_NODE}"
 				}
 			}
 		}

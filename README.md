@@ -1,9 +1,9 @@
 # nginx-full
 
 <p>
-  <img src="https://img.shields.io/badge/openresty-1.27.1.2-green.svg?style=for-the-badge">
-  <img src="https://img.shields.io/badge/lua-5.1.5-green.svg?style=for-the-badge">
-  <img src="https://img.shields.io/badge/luarocks-3.3.1-green.svg?style=for-the-badge">
+  <img src="https://img.shields.io/badge/openresty-1.29.2.4-green.svg?style=for-the-badge">
+  <img src="https://img.shields.io/badge/lua-5.5.0-green.svg?style=for-the-badge">
+  <img src="https://img.shields.io/badge/luarocks-3.13.0-green.svg?style=for-the-badge">
   <a href="https://hub.docker.com/repository/docker/nginxproxymanager/nginx-full">
     <img src="https://img.shields.io/docker/stars/nginxproxymanager/nginx-full.svg?style=for-the-badge">
   </a>
@@ -19,7 +19,6 @@ The following images are built:
 **latest**
 - OpenResty
 - Lua
-- [Crowdsec Openresty Bouncer](https://github.com/crowdsecurity/cs-openresty-bouncer)
 
 **certbot**
 - Certbot

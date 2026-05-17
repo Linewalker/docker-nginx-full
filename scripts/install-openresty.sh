@@ -8,7 +8,7 @@ RESET='\E[0m'
 
 echo -e "${BLUE}❯ ${CYAN}Installing OpenResty ${YELLOW}${OPENRESTY_VERSION}...${RESET}"
 
-cd /tmp/openresty
+cd "/tmp/openresty/openresty-${OPENRESTY_VERSION}"
 make install
 rm -rf /tmp/openresty
 

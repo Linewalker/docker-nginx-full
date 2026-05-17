@@ -10,12 +10,13 @@ echo -e "${BLUE}❯ ${CYAN}Building Lua ${YELLOW}${LUA_VERSION}...${RESET}"
 
 cd /tmp
 wget "http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
-tar -xzf lua-${LUA_VERSION}.tar.gz
-mv /tmp/lua-${LUA_VERSION} /tmp/lua
+tar -xzf "lua-${LUA_VERSION}.tar.gz"
+mv "/tmp/lua-${LUA_VERSION}" /tmp/lua
 cd /tmp/lua
 
 make linux test
-# We have to install Lua for the Luarocks build to succeed, it will be installed again when building the final image
+# We have to install Lua for the Luarocks build to succeed,
+# it will be installed again when building the final image
 make install
 
 echo -e "${BLUE}❯ ${GREEN}Lua build completed${RESET}"

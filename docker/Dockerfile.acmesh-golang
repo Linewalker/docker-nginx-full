@@ -32,8 +32,8 @@ WORKDIR /root
 COPY ./files/.bashrc.acmesh-golang /root/.bashrc
 
 # Gotools
-COPY ./scripts/install-gotools /tmp/install-gotools
-RUN /tmp/install-gotools
+COPY ./scripts/install-gotools.sh /tmp/install-gotools.sh
+RUN /tmp/install-gotools.sh
 
 LABEL org.label-schema.cmd="docker run --rm -ti nginxproxymanager/nginx-full:acmesh-golang"
 
