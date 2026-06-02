@@ -28,12 +28,11 @@ pipeline {
 					}
 					steps {
 						script {
-							env.BASE_IMAGE                     = "${DOCKERHUB_NAMESPACE}/${IMAGE}:latest"
-							env.BUILDX_PUSH_TAGS               = "-t ${BASE_IMAGE}"
-							env.BUILDX_PUSH_TAGS_ACMESH        = "-t ${DOCKERHUB_NAMESPACE}/${IMAGE}:acmesh"
-							env.BUILDX_PUSH_TAGS_CERTBOT       = "-t ${DOCKERHUB_NAMESPACE}/${IMAGE}:certbot"
-							env.BUILDX_PUSH_TAGS_ACMESH_GOLANG = "-t ${DOCKERHUB_NAMESPACE}/${IMAGE}:acmesh-golang"
-							env.BUILDX_PUSH_TAGS_CERTBOT_NODE  = "-t ${DOCKERHUB_NAMESPACE}/${IMAGE}:certbot-node"
+							env.BASE_IMAGE          = "${DOCKERHUB_NAMESPACE}/${IMAGE}:latest"
+							env.ACMESH_IMAGE        = "${DOCKERHUB_NAMESPACE}/${IMAGE}:acmesh"
+							env.CERTBOT_IMAGE       = "${DOCKERHUB_NAMESPACE}/${IMAGE}:certbot"
+							env.ACMESH_GOLANG_IMAGE = "${ACMESH_IMAGE}-golang"
+							env.CERTBOT_NODE_IMAGE  = "${CERTBOT_IMAGE}-node"
 						}
 					}
 				}
@@ -46,14 +45,11 @@ pipeline {
 					steps {
 						script {
 							// Defaults to the Branch name, which is applies to all branches AND pr's
-							env.BASE_IMAGE                     = "${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}"
-							env.ACMESH_IMAGE                   = "${BASE_IMAGE}-acmesh"
-							env.CERTBOT_IMAGE                  = "${BASE_IMAGE}-certbot"
-							env.BUILDX_PUSH_TAGS               = "-t ${BASE_IMAGE}"
-							env.BUILDX_PUSH_TAGS_ACMESH        = "${BUILDX_PUSH_TAGS}-acmesh"
-							env.BUILDX_PUSH_TAGS_CERTBOT       = "${BUILDX_PUSH_TAGS}-certbot"
-							env.BUILDX_PUSH_TAGS_ACMESH_GOLANG = "${BUILDX_PUSH_TAGS}-acmesh-golang"
-							env.BUILDX_PUSH_TAGS_CERTBOT_NODE  = "${BUILDX_PUSH_TAGS}-certbot-node"
+							env.BASE_IMAGE          = "${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}"
+							env.ACMESH_IMAGE        = "${BASE_IMAGE}-acmesh"
+							env.CERTBOT_IMAGE       = "${BASE_IMAGE}-certbot"
+							env.ACMESH_GOLANG_IMAGE = "${ACMESH_IMAGE}-golang"
+							env.CERTBOT_NODE_IMAGE  = "${CERTBOT_IMAGE}-node"
 						}
 					}
 				}
@@ -66,7 +62,7 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx.sh --push -f docker/Dockerfile ${BUILDX_PUSH_TAGS}"
+					sh './scripts/buildx.sh --push -f docker/Dockerfile -t "${BASE_IMAGE}"'
 				}
 				sh 'scripts/ci/test.sh "${BASE_IMAGE}"'
 			}
@@ -78,11 +74,11 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx.sh --push -f docker/Dockerfile.acmesh ${BUILDX_PUSH_TAGS_ACMESH}"
-					sh "./scripts/buildx.sh --push -f docker/Dockerfile.certbot ${BUILDX_PUSH_TAGS_CERTBOT}"
+					sh './scripts/buildx.sh --push -f docker/Dockerfile.acmesh -t "${ACMESH_IMAGE}"'
+					sh './scripts/buildx.sh --push -f docker/Dockerfile.certbot -t "${CERTBOT_IMAGE}"'
 				}
-				sh 'scripts/ci/test.sh "${BASE_IMAGE}-acmesh"'
-				sh 'scripts/ci/test.sh "${BASE_IMAGE}-certbot"'
+				sh 'scripts/ci/test.sh "${ACMESH_IMAGE}"'
+				sh 'scripts/ci/test.sh "${CERTBOT_IMAGE}"'
 			}
 		}
 		stage('Dev Tools') {
@@ -92,11 +88,11 @@ pipeline {
 			steps {
 				withCredentials([usernamePassword(credentialsId: 'jc21-dockerhub', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
 					sh 'docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"'
-					sh "./scripts/buildx.sh --push -f docker/Dockerfile.acmesh-golang ${BUILDX_PUSH_TAGS_ACMESH_GOLANG}"
-					sh "./scripts/buildx.sh --push -f docker/Dockerfile.certbot-node ${BUILDX_PUSH_TAGS_CERTBOT_NODE}"
+					sh './scripts/buildx.sh --push -f docker/Dockerfile.acmesh-golang -t "${ACMESH_GOLANG_IMAGE}"'
+					sh './scripts/buildx.sh --push -f docker/Dockerfile.certbot-node -t "${CERTBOT_NODE_IMAGE}"'
 				}
-				sh 'scripts/ci/test.sh "${BASE_IMAGE}-acmesh-golang"'
-				sh 'scripts/ci/test.sh "${BASE_IMAGE}-certbot-node"'
+				sh 'scripts/ci/test.sh "${ACMESH_GOLANG_IMAGE}"'
+				sh 'scripts/ci/test.sh "${CERTBOT_NODE_IMAGE}"'
 			}
 		}
 		stage('PR Comment') {
@@ -112,11 +108,11 @@ pipeline {
 				script {
 					def comment = pullRequest.comment("""Docker Image for build ${BUILD_NUMBER} is available on [DockerHub](https://cloud.docker.com/repository/docker/${DOCKERHUB_NAMESPACE}/${IMAGE}) as:
 
-- `${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}`
-- `${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}-certbot`
-- `${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}-certbot-node`
-- `${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}-acmesh`
-- `${DOCKERHUB_NAMESPACE}/${IMAGE}:github-${BRANCH_LOWER}-acmesh-golang`
+- `${BASE_IMAGE}`
+- `${CERTBOT_IMAGE}`
+- `${CERTBOT_NODE_IMAGE}`
+- `${ACMESH_IMAGE}`
+- `${ACMESH_GOLANG_IMAGE}`
 """)
 				}
 			}
