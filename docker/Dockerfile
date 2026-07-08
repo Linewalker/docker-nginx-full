@@ -23,6 +23,10 @@ RUN apt-get update \
 	libmaxminddb-dev \
 	dos2unix
 
+# brotli build
+COPY ./scripts/build-brotli /tmp/build-brotli
+RUN /tmp/build-brotli
+
 # Lua build
 COPY ./scripts/build-lua.sh /tmp/build-lua.sh
 RUN /tmp/build-lua.sh
@@ -72,6 +76,7 @@ COPY ./files/.bashrc /root/.bashrc
 
 # Copy lua and luarocks builds from first image
 COPY --from=nginxbuilder /tmp/lua /tmp/lua
+COPY --from=nginxbuilder /tmp/ngx_brotli /tmp/ngx_brotli
 COPY --from=nginxbuilder /tmp/luarocks /tmp/luarocks
 COPY ./scripts/install-lua.sh /tmp/install-lua.sh
 
