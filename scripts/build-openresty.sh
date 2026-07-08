@@ -26,6 +26,11 @@ make
 
 cd "/tmp/openresty/openresty-${OPENRESTY_VERSION}"
 
+BROTI_MODULE="--add-module=/tmp/ngx_brotli"
+if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then
+	BROTI_MODULE=
+fi
+
 ./configure \
 	--prefix=/etc/nginx \
 	--sbin-path=/usr/sbin/nginx \
@@ -66,7 +71,8 @@ cd "/tmp/openresty/openresty-${OPENRESTY_VERSION}"
 	--with-stream_ssl_module \
 	--with-stream_ssl_preread_module \
 	--with-http_v3_module \
-	--add-dynamic-module=/tmp/openresty/ngx_http_geoip2_module
+	--add-dynamic-module=/tmp/openresty/ngx_http_geoip2_module \
+	${BROTI_MODULE}
 
 make -j2
 
