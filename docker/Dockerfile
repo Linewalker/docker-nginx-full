@@ -68,6 +68,7 @@ RUN apt-get update \
 	xz-utils \
 	libmaxminddb-dev \
 	moreutils \
+	cmake \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/cache/* /var/log/* /tmp/* /var/lib/dpkg/status-old
