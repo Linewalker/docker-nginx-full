@@ -14,7 +14,7 @@ RUN apt-get update \
 	cmake \
 	ca-certificates \
 	libncurses-dev \
-	libpcre3-dev \
+	libpcre2-dev \
 	libreadline-dev \
 	libssl-dev \
 	openssl unzip \
