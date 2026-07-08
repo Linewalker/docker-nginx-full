@@ -14,19 +14,18 @@ RUN apt-get update \
 	cmake \
 	ca-certificates \
 	libncurses-dev \
-	libpcre2-dev \
+	libpcre3-dev \
 	libreadline-dev \
 	libssl-dev \
 	openssl unzip \
 	wget \
 	zlib1g-dev \
 	git \
-	libmaxminddb-dev \
-	dos2unix
+	libmaxminddb-dev
 
 # brotli build
-COPY ./scripts/build-brotli.sh /tmp/build-brotli.sh
-RUN /tmp/build-brotli.sh
+COPY ./scripts/build-brotli /tmp/build-brotli
+RUN /tmp/build-brotli
 
 # Lua build
 COPY ./scripts/build-lua.sh /tmp/build-lua.sh
