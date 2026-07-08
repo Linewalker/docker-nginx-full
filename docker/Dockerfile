@@ -2,7 +2,7 @@
 # Nginx Builder
 #############
 
-FROM debian:bookworm-slim AS nginxbuilder
+FROM debian:trixie-slim AS nginxbuilder
 
 ARG OPENRESTY_VERSION
 ARG LUA_VERSION
