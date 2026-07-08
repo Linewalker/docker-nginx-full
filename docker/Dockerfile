@@ -25,8 +25,8 @@ RUN apt-get update \
 	dos2unix
 
 # brotli build
-COPY ./scripts/build-brotli /tmp/build-brotli
-RUN /tmp/build-brotli
+COPY ./scripts/build-brotli.sh /tmp/build-brotli.sh
+RUN /tmp/build-brotli.sh
 
 # Lua build
 COPY ./scripts/build-lua.sh /tmp/build-lua.sh
