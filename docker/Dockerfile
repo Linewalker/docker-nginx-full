@@ -11,6 +11,7 @@ ARG LUAROCKS_VERSION
 RUN apt-get update \
 	&& apt-get install -y \
 	build-essential \
+	cmake \
 	ca-certificates \
 	libncurses-dev \
 	libpcre2-dev \
@@ -68,7 +69,6 @@ RUN apt-get update \
 	xz-utils \
 	libmaxminddb-dev \
 	moreutils \
-	cmake \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/cache/* /var/log/* /tmp/* /var/lib/dpkg/status-old
